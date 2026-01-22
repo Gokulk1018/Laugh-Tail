@@ -20,19 +20,16 @@ export default function NavigationLayout() {
             case "home":
               iconName = focused ? "home" : "home-outline";
               break;
-            case "categories":
-              iconName = focused ? "grid" : "grid-outline";
-              break;
-            case "favorite":
-              iconName = focused ? "heart" : "heart-outline";
+            case "ai":
+              iconName = focused ? "sparkles" : "sparkles-outline";
               break;
             case "search":
               iconName = focused ? "search" : "search-outline";
               break;
-            case "ai":
-              iconName = focused ? "sparkles" : "sparkles-outline";
+            case "favorite":
+              iconName = focused ? "heart" : "heart-outline";
               break;
-            case "settings":
+            case "setting":
               iconName = focused ? "settings" : "settings-outline";
               break;
           }
@@ -41,12 +38,20 @@ export default function NavigationLayout() {
         },
       })}
     >
+      {/* ✅ ONLY THESE 5 TABS EXIST */}
       <Tabs.Screen name="home" options={{ title: "Home" }} />
-      <Tabs.Screen name="categories" options={{ title: "Categories" }} />
-      <Tabs.Screen name="favorite" options={{ title: "Favorite" }} />
-      <Tabs.Screen name="search" options={{ title: "Search" }} />
       <Tabs.Screen name="ai" options={{ title: "AI" }} />
-      <Tabs.Screen name="settings" options={{ title: "Settings" }} />
+      <Tabs.Screen name="search" options={{ title: "Search" }} />
+      <Tabs.Screen name="favorite" options={{ title: "Liked" }} />
+      <Tabs.Screen name="setting" options={{ title: "Setting" }} />
+
+      {/* ❌ COMPLETELY DISABLE CATEGORIES */}
+      <Tabs.Screen
+        name="categories"
+        options={{
+          href: null, // THIS kills the tab & navigation
+        }}
+      />
     </Tabs>
   );
 }

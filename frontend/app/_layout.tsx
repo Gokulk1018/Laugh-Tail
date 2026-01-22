@@ -6,9 +6,8 @@ export default function RootLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="login" />
       <Stack.Screen name="onboarding" />
-      <Stack.Screen name="get-started" />
 
-      {/* home lives here */}
+      {/* 👇 THIS ENABLES THE BOTTOM TABS */}
       <Stack.Screen name="(navigation)" />
     </Stack>
   );

@@ -60,7 +60,7 @@ export default function Home() {
         {/* CATEGORIES */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Categories</Text>
-          <TouchableOpacity onPress={() => router.push("/(navigation)/categories")}>
+          <TouchableOpacity onPress={() => router.push("/categories")}>
             <Text style={styles.viewAll}>View all</Text>
           </TouchableOpacity>
         </View>
