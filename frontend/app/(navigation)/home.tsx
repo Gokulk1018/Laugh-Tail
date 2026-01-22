@@ -44,12 +44,16 @@ export default function Home() {
         {/* HEADER */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Hello 👋</Text>
+            <Text style={styles.greeting}>Hello Gokul 👋</Text>
             <Text style={styles.subtitle}>Explore the world</Text>
           </View>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>👤</Text>
-          </View>
+          <TouchableOpacity
+  style={styles.avatar}
+  onPress={() => router.push("/(navigation)/profile")}
+>
+  <Text style={styles.avatarText}>👤</Text>
+</TouchableOpacity>
+
         </View>
 
         {/* SEARCH */}
