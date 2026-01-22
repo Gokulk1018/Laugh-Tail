@@ -27,7 +27,7 @@ export default function GetStarted() {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push("/login")}
+          onPress={() => router.replace("/(navigation)/home")}
         >
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>

@@ -59,7 +59,7 @@ export default function Onboarding() {
               {item.id === "3" && (
                 <TouchableOpacity
                   style={styles.btn}
-                  onPress={() => router.replace("/home")}
+                  onPress={() => router.replace("/get-started")}
                 >
                   <Text style={styles.btnText}>Let’s Explore</Text>
                 </TouchableOpacity>
