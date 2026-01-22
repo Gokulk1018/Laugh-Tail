@@ -9,6 +9,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 const categories = [
   { id: "1", name: "Beach", icon: "🏖️" },
@@ -47,13 +48,14 @@ export default function Home() {
             <Text style={styles.greeting}>Hello Gokul 👋</Text>
             <Text style={styles.subtitle}>Explore the world</Text>
           </View>
-          <TouchableOpacity
-  style={styles.avatar}
-  onPress={() => router.push("/(navigation)/profile")}
->
-  <Text style={styles.avatarText}>👤</Text>
-</TouchableOpacity>
 
+          {/* ⚙️ SETTINGS ICON */}
+          <TouchableOpacity
+            style={styles.avatar}
+            onPress={() => router.push("/(navigation)/setting")}
+          >
+            <Ionicons name="settings-outline" size={22} color="#0f172a" />
+          </TouchableOpacity>
         </View>
 
         {/* SEARCH */}
@@ -121,14 +123,28 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   greeting: { fontSize: 22, fontWeight: "700", color: "#0f172a" },
   subtitle: { color: "#64748b" },
-  avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: "#e2e8f0", alignItems: "center", justifyContent: "center" },
-  avatarText: { fontSize: 18 },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#e2e8f0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   searchBox: { backgroundColor: "#fff", borderRadius: 14, marginVertical: 16, paddingHorizontal: 14 },
   searchInput: { height: 44 },
   sectionHeader: { flexDirection: "row", justifyContent: "space-between", marginVertical: 12 },
   sectionTitle: { fontSize: 18, fontWeight: "700" },
   viewAll: { color: "#2563eb", fontWeight: "600" },
-  categoryCard: { width: 90, height: 90, backgroundColor: "#040404", borderRadius: 45, justifyContent: "center", alignItems: "center", marginRight: 12 },
+  categoryCard: {
+    width: 90,
+    height: 90,
+    backgroundColor: "#040404",
+    borderRadius: 45,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
   categoryIcon: { fontSize: 26 },
   categoryText: { color: "#fff", fontSize: 12, marginTop: 6 },
   placeCard: { width: 170, backgroundColor: "#fff", borderRadius: 18, padding: 10, marginRight: 14 },
