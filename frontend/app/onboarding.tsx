@@ -7,7 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
@@ -16,60 +16,52 @@ const slides = [
   {
     id: "1",
     image: require("../assets/images/startpop1.jpg"),
-    title: "Discover Beautiful Places",
-    desc: "Find amazing destinations and hidden gems around the world.",
+    title: "Discover Places",
+    desc: "Find amazing destinations around the world.",
   },
   {
     id: "2",
     image: require("../assets/images/startpop2.jpg"),
-    title: "Plan Your Perfect Trip",
-    desc: "Smart recommendations based on season, mood, and interests.",
+    title: "Plan Smart Trips",
+    desc: "AI-powered recommendations for you.",
   },
   {
     id: "3",
     image: require("../assets/images/startpop3.jpg"),
-    title: "Travel. Explore. Enjoy.",
-    desc: "Let’s begin your journey with us.",
+    title: "Ready to Explore?",
+    desc: "Let’s begin your journey.",
   },
 ];
 
 export default function Onboarding() {
   const [index, setIndex] = useState(0);
-  const flatRef = useRef<FlatList>(null);
   const router = useRouter();
 
-  const onScroll = (e: any) => {
-    const slideIndex = Math.round(
-      e.nativeEvent.contentOffset.x / width
-    );
-    setIndex(slideIndex);
-  };
-
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
       <FlatList
-        ref={flatRef}
         data={slides}
         horizontal
         pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={onScroll}
+        onScroll={(e) =>
+          setIndex(Math.round(e.nativeEvent.contentOffset.x / width))
+        }
         renderItem={({ item }) => (
           <ImageBackground
             source={item.image}
             style={styles.image}
+            resizeMode="cover"
           >
-            {/* Bottom Card */}
             <View style={styles.card}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.desc}>{item.desc}</Text>
 
               {item.id === "3" && (
                 <TouchableOpacity
-                  style={styles.exploreBtn}
-                  onPress={() => router.replace("/")}
+                  style={styles.btn}
+                  onPress={() => router.replace("/home")}
                 >
-                  <Text style={styles.exploreText}>Let’s Explore</Text>
+                  <Text style={styles.btnText}>Let’s Explore</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -77,14 +69,13 @@ export default function Onboarding() {
         )}
       />
 
-      {/* DOT INDICATOR */}
       <View style={styles.dots}>
         {slides.map((_, i) => (
           <View
             key={i}
             style={[
               styles.dot,
-              index === i ? styles.activeDot : styles.inactiveDot,
+              i === index ? styles.active : styles.inactive,
             ]}
           />
         ))}
@@ -94,73 +85,55 @@ export default function Onboarding() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#000",
-  },
-
   image: {
     width,
     height,
     justifyContent: "flex-end",
   },
-
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
     margin: 16,
     borderRadius: 22,
     padding: 20,
   },
-
   title: {
     fontSize: 24,
     fontWeight: "700",
-    marginBottom: 10,
-    color: "#0f172a",
   },
-
   desc: {
-    fontSize: 14,
     color: "#64748b",
-    lineHeight: 20,
+    marginTop: 8,
   },
-
-  exploreBtn: {
-    marginTop: 20,
+  btn: {
     backgroundColor: "#0f172a",
-    paddingVertical: 14,
+    padding: 14,
     borderRadius: 14,
+    marginTop: 16,
     alignItems: "center",
   },
-
-  exploreText: {
-    color: "#ffffff",
-    fontSize: 16,
+  btnText: {
+    color: "#fff",
     fontWeight: "600",
   },
-
   dots: {
     position: "absolute",
     bottom: 40,
     flexDirection: "row",
     alignSelf: "center",
   },
-
   dot: {
     marginHorizontal: 6,
   },
-
-  activeDot: {
+  active: {
     width: 24,
     height: 6,
-    borderRadius: 3,
     backgroundColor: "#0f172a",
+    borderRadius: 3,
   },
-
-  inactiveDot: {
+  inactive: {
     width: 8,
     height: 8,
-    borderRadius: 4,
     backgroundColor: "#cbd5e1",
+    borderRadius: 4,
   },
 });

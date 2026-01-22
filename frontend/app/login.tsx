@@ -6,37 +6,42 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function Login() {
+  const router = useRouter();
+
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
         source={require("../assets/images/login.jpg")}
-        style={styles.background}
+        style={styles.bg}
         resizeMode="cover"
       >
-        {/* Dark overlay */}
         <View style={styles.overlay} />
 
-        {/* White Card */}
         <View style={styles.card}>
-          <Text style={styles.heading}>Sign in options</Text>
+          <Text style={styles.title}>Sign in options</Text>
 
-          <TouchableOpacity style={styles.emailBtn}>
-            <Text style={styles.emailText}>Continue with Email</Text>
+          <TouchableOpacity
+            style={styles.primaryBtn}
+            onPress={() => router.replace("/onboarding")}
+
+          >
+            <Text style={styles.primaryText}>Continue with Email</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialBtn}>
-            <Text style={styles.socialText}>Sign in with Google</Text>
+          <TouchableOpacity style={styles.secondaryBtn}>
+            <Text>Sign in with Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialBtn}>
-            <Text style={styles.socialText}>Sign in with Apple ID</Text>
+          <TouchableOpacity style={styles.secondaryBtn}>
+            <Text>Sign in with Apple ID</Text>
           </TouchableOpacity>
 
-          <Text style={styles.footerText}>
+          <Text style={styles.footer}>
             Don’t have an account?{" "}
-            <Text style={styles.signup}>Sign Up</Text>
+            <Text style={styles.link}>Sign Up</Text>
           </Text>
         </View>
       </ImageBackground>
@@ -44,73 +49,50 @@ export default function Login() {
   );
 }
 
-
 const styles = StyleSheet.create({
-  safe: {
+  bg: {
     flex: 1,
-    backgroundColor: "#000",
+    justifyContent: "flex-end",
   },
-
-  background: {
-    flex: 1,
-    justifyContent: "flex-end", // card sticks to bottom
-  },
-
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.35)", // makes card readable
+    backgroundColor: "rgba(0,0,0,0.35)",
   },
-
-  /* WHITE CARD */
   card: {
-    backgroundColor: "#ffffff",
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 20,
+    backgroundColor: "#fff",
+    padding: 24,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
   },
-
-  heading: {
+  title: {
     fontSize: 26,
     fontWeight: "700",
-    marginBottom: 22,
-    color: "#0f172a",
+    marginBottom: 20,
   },
-
-  emailBtn: {
+  primaryBtn: {
     backgroundColor: "#0f172a",
-    paddingVertical: 15,
+    padding: 16,
     borderRadius: 16,
     alignItems: "center",
     marginBottom: 16,
   },
-  emailText: {
-    color: "#ffffff",
-    fontSize: 16,
+  primaryText: {
+    color: "#fff",
     fontWeight: "600",
   },
-
-  socialBtn: {
+  secondaryBtn: {
     backgroundColor: "#f1f5f9",
-    paddingVertical: 15,
+    padding: 16,
     borderRadius: 16,
     alignItems: "center",
-    marginBottom: 14,
+    marginBottom: 12,
   },
-  socialText: {
-    color: "#0f172a",
-    fontSize: 15,
-    fontWeight: "500",
-  },
-
-  footerText: {
-    marginTop: 12,
+  footer: {
     textAlign: "center",
+    marginTop: 12,
     color: "#64748b",
-    fontSize: 14,
   },
-  signup: {
+  link: {
     color: "#2563eb",
     fontWeight: "600",
   },
