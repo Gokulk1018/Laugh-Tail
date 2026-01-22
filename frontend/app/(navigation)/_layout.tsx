@@ -6,13 +6,21 @@ export default function NavigationLayout() {
     <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: "#2563eb",
-        tabBarInactiveTintColor: "#94a3b8",
+
+        // 🔥 ICON COLORS
+        tabBarActiveTintColor: "#ffffff",
+        tabBarInactiveTintColor: "#9ca3af",
+
+        // 🔥 BLACK NAVBAR
         tabBarStyle: {
           height: 65,
           paddingBottom: 8,
           paddingTop: 6,
+          backgroundColor: "#000000",
+          borderTopWidth: 0,        // removes ugly line
+          elevation: 10,            // Android shadow
         },
+
         tabBarIcon: ({ color, size, focused }) => {
           let iconName: any;
 
@@ -38,20 +46,11 @@ export default function NavigationLayout() {
         },
       })}
     >
-      {/* ✅ ONLY THESE 5 TABS EXIST */}
       <Tabs.Screen name="home" options={{ title: "Home" }} />
       <Tabs.Screen name="ai" options={{ title: "AI" }} />
       <Tabs.Screen name="search" options={{ title: "Search" }} />
       <Tabs.Screen name="favorite" options={{ title: "Liked" }} />
       <Tabs.Screen name="setting" options={{ title: "Setting" }} />
-
-      {/* ❌ COMPLETELY DISABLE CATEGORIES */}
-      <Tabs.Screen
-        name="categories"
-        options={{
-          href: null, // THIS kills the tab & navigation
-        }}
-      />
     </Tabs>
   );
 }

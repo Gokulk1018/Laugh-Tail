@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: "row", justifyContent: "space-between", marginVertical: 12 },
   sectionTitle: { fontSize: 18, fontWeight: "700" },
   viewAll: { color: "#2563eb", fontWeight: "600" },
-  categoryCard: { width: 90, height: 90, backgroundColor: "#2563eb", borderRadius: 45, justifyContent: "center", alignItems: "center", marginRight: 12 },
+  categoryCard: { width: 90, height: 90, backgroundColor: "#040404", borderRadius: 45, justifyContent: "center", alignItems: "center", marginRight: 12 },
   categoryIcon: { fontSize: 26 },
   categoryText: { color: "#fff", fontSize: 12, marginTop: 6 },
   placeCard: { width: 170, backgroundColor: "#fff", borderRadius: 18, padding: 10, marginRight: 14 },

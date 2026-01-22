@@ -31,18 +31,30 @@ export default function Login() {
             <Text style={styles.primaryText}>Continue with Email</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.secondaryBtn}>
-            <Text>Sign in with Google</Text>
-          </TouchableOpacity>
+          <TouchableOpacity
+  style={styles.secondaryBtn}
+  onPress={() => router.push("/google-signin")}
+>
+  <Text>Sign in with Google</Text>
+</TouchableOpacity>
 
-          <TouchableOpacity style={styles.secondaryBtn}>
-            <Text>Sign in with Apple ID</Text>
-          </TouchableOpacity>
+
+          <TouchableOpacity
+  style={styles.secondaryBtn}
+  onPress={() => router.replace("/onboarding")}
+>
+  <Text>Sign in with Apple ID</Text>
+</TouchableOpacity>
 
           <Text style={styles.footer}>
-            Don’t have an account?{" "}
-            <Text style={styles.link}>Sign Up</Text>
-          </Text>
+  Don’t have an account?{" "}
+  <Text
+    style={styles.link}
+    onPress={() => router.push("/signup")}
+  >
+    Sign Up
+  </Text>
+</Text>
         </View>
       </ImageBackground>
     </SafeAreaView>
