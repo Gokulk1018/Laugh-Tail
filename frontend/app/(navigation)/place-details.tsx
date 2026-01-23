@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import { placesData, Place, Reply } from "../data/places";
 
 export default function PlaceDetails() {
@@ -17,13 +18,14 @@ export default function PlaceDetails() {
     index?: string;
   }>();
 
-  const sectionKey = String(section);
-  const placeIndex = Number(index);
+  const places: Place[] = placesData[String(section)] || [];
+  const place = places[Number(index)];
 
-  const places: Place[] = placesData[sectionKey] || [];
-  const place = places[placeIndex];
+  /* ---------- LOCAL UI STATE ---------- */
+  const [likedComments, setLikedComments] = useState<Record<string, boolean>>(
+    {}
+  );
 
-  /* ---------- SAFETY CHECK ---------- */
   if (!place) {
     return (
       <View style={styles.center}>
@@ -35,14 +37,29 @@ export default function PlaceDetails() {
     );
   }
 
+  const toggleLike = (id: string) => {
+    setLikedComments((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   /* ---------- RENDER REPLIES (TREE) ---------- */
   const renderReplies = (replies: Reply[], level = 1) => {
     if (!replies || replies.length === 0) return null;
 
     return replies.map((reply, i) => (
-      <View key={i} style={{ marginLeft: level * 18, marginTop: 8 }}>
-        <Text style={styles.replyUser}>{reply.user}</Text>
-        <Text style={styles.replyText}>{reply.text}</Text>
+      <View key={i} style={{ marginLeft: level * 22, marginTop: 10 }}>
+        <View style={styles.replyRow}>
+          <Text style={styles.replyUser}>{reply.user}</Text>
+          <Text style={styles.replyText}>{reply.text}</Text>
+        </View>
+
+        {/* Reply CTA (UI only) */}
+        <TouchableOpacity>
+          <Text style={styles.replyBtn}>Reply</Text>
+        </TouchableOpacity>
+
         {reply.replies && renderReplies(reply.replies, level + 1)}
       </View>
     ));
@@ -57,7 +74,6 @@ export default function PlaceDetails() {
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>{place.title}</Text>
-
         <View style={{ width: 24 }} />
       </View>
 
@@ -85,11 +101,7 @@ export default function PlaceDetails() {
         </View>
 
         {/* ---------- CATEGORIES ---------- */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.chipRow}
-        >
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow}>
           {place.categories.map((cat, i) => (
             <View key={i} style={styles.chip}>
               <Text style={styles.chipText}>{cat}</Text>
@@ -109,13 +121,35 @@ export default function PlaceDetails() {
           </Text>
         )}
 
-        {place.discussions.map((d) => (
-          <View key={d.id} style={styles.commentCard}>
-            <Text style={styles.commentUser}>{d.user}</Text>
-            <Text style={styles.commentText}>{d.text}</Text>
-            {renderReplies(d.replies)}
-          </View>
-        ))}
+        {place.discussions.map((d) => {
+          const isLiked = likedComments[d.id];
+
+          return (
+            <View key={d.id} style={styles.commentCard}>
+              {/* USER + COMMENT */}
+              <Text style={styles.commentUser}>{d.user}</Text>
+              <Text style={styles.commentText}>{d.text}</Text>
+
+              {/* ACTION ROW */}
+              <View style={styles.actionRow}>
+                <TouchableOpacity onPress={() => toggleLike(d.id)}>
+                  <Ionicons
+                    name={isLiked ? "heart" : "heart-outline"}
+                    size={20}
+                    color={isLiked ? "#ef4444" : "#64748b"}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity>
+                  <Text style={styles.replyBtn}>Reply</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* REPLIES */}
+              {renderReplies(d.replies)}
+            </View>
+          );
+        })}
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -126,10 +160,7 @@ export default function PlaceDetails() {
 /* ---------------- STYLES ---------------- */
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: "#f8fafc",
-  },
+  screen: { flex: 1, backgroundColor: "#f8fafc" },
 
   header: {
     height: 56,
@@ -148,10 +179,7 @@ const styles = StyleSheet.create({
     color: "#0f172a",
   },
 
-  image: {
-    width: "100%",
-    height: 260,
-  },
+  image: { width: "100%", height: 260 },
 
   title: {
     fontSize: 22,
@@ -180,10 +208,7 @@ const styles = StyleSheet.create({
     color: "#0f172a",
   },
 
-  chipRow: {
-    marginTop: 12,
-    paddingLeft: 16,
-  },
+  chipRow: { marginTop: 12, paddingLeft: 16 },
 
   chip: {
     backgroundColor: "#e2e8f0",
@@ -193,11 +218,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
 
-  chipText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#0f172a",
-  },
+  chipText: { fontSize: 12, fontWeight: "600" },
 
   description: {
     margin: 16,
@@ -210,7 +231,6 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     marginHorizontal: 16,
     marginTop: 24,
-    color: "#0f172a",
   },
 
   noDiscussion: {
@@ -224,33 +244,28 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 12,
     padding: 14,
-    borderRadius: 14,
+    borderRadius: 16,
   },
 
-  commentUser: {
-    fontWeight: "700",
-    color: "#0f172a",
-  },
+  commentUser: { fontWeight: "700" },
+  commentText: { marginTop: 4, color: "#374151" },
 
-  commentText: {
-    marginTop: 4,
-    color: "#374151",
-  },
-
-  replyUser: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#0f172a",
-  },
-
-  replyText: {
-    fontSize: 13,
-    color: "#475569",
-  },
-
-  center: {
-    flex: 1,
-    justifyContent: "center",
+  actionRow: {
+    flexDirection: "row",
     alignItems: "center",
+    gap: 16,
+    marginTop: 8,
   },
+
+  replyBtn: {
+    color: "#2563eb",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+
+  replyRow: { marginTop: 6 },
+  replyUser: { fontSize: 13, fontWeight: "700" },
+  replyText: { fontSize: 13, color: "#475569" },
+
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
