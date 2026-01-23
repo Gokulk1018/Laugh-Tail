@@ -119,7 +119,7 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f8fafc" },
-  container: { flex: 1, paddingHorizontal: 16, paddingTop: 30 },
+  container: { flex: 1, paddingHorizontal: 16, paddingTop: 50 },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   greeting: { fontSize: 22, fontWeight: "700", color: "#0f172a" },
   subtitle: { color: "#64748b" },
