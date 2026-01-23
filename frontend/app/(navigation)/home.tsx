@@ -27,23 +27,23 @@ const categories = [
 /* ---------------- NEARBY PLACES ---------------- */
 
 const nearbyPlaces = [
-  { id: "1", title: "Marina Beach", image: require("../../assets/images/marina.jpg") }, // TN
-  { id: "2", title: "Mahabalipuram", image: require("../../assets/images/mahabalipuram.jpg") }, // TN
-  { id: "3", title: "Pondicherry", image: require("../../assets/images/pondicherry.jpg") }, // India
-  { id: "4", title: "Goa Beach", image: require("../../assets/images/goa.jpg") }, // India
-  { id: "5", title: "Bali", image: require("../../assets/images/bali.jpg") }, // World
-  { id: "6", title: "Phuket", image: require("../../assets/images/phuket.jpg") }, // World
+  { id: "1", title: "Marina Beach", image: require("../../assets/images/marina.jpg") },
+  { id: "2", title: "Mahabalipuram", image: require("../../assets/images/mahabalipuram.jpg") },
+  { id: "3", title: "Pondicherry", image: require("../../assets/images/pondicherry.jpg") },
+  { id: "4", title: "Goa Beach", image: require("../../assets/images/goa.jpg") },
+  { id: "5", title: "Bali", image: require("../../assets/images/bali.jpg") },
+  { id: "6", title: "Phuket", image: require("../../assets/images/phuket.jpg") },
 ];
 
 /* ---------------- FALLS ---------------- */
 
 const falls = [
-  { id: "1", title: "Courtallam Falls", image: require("../../assets/images/courtallam.jpg") }, // TN
-  { id: "2", title: "Hogenakkal Falls", image: require("../../assets/images/hogenakkal.jpg") }, // TN
-  { id: "3", title: "Jog Falls", image: require("../../assets/images/jogfalls.jpg") }, // India
-  { id: "4", title: "Athirappilly Falls", image: require("../../assets/images/athirappilly.jpg") }, // India
-  { id: "5", title: "Niagara Falls", image: require("../../assets/images/niagara.jpg") }, // World
-  { id: "6", title: "Victoria Falls", image: require("../../assets/images/victoria.jpg") }, // World
+  { id: "1", title: "Courtallam Falls", image: require("../../assets/images/courtallam.jpg") },
+  { id: "2", title: "Hogenakkal Falls", image: require("../../assets/images/hogenakkal.jpg") },
+  { id: "3", title: "Jog Falls", image: require("../../assets/images/jogfalls.jpg") },
+  { id: "4", title: "Athirappilly Falls", image: require("../../assets/images/athirappilly.jpg") },
+  { id: "5", title: "Niagara Falls", image: require("../../assets/images/niagara.jpg") },
+  { id: "6", title: "Victoria Falls", image: require("../../assets/images/victoria.jpg") },
 ];
 
 /* ---------------- BEACHES ---------------- */
@@ -90,17 +90,6 @@ const amusementParks = [
   { id: "6", title: "Universal Studios", image: require("../../assets/images/universal.jpg") },
 ];
 
-/* ---------------- CHILD FAVORITES ---------------- */
-
-const kidsFavorites = [
-  { id: "1", title: "VGP Marine Kingdom", image: require("../../assets/images/vgp.jpg") },
-  { id: "2", title: "Arignar Anna Zoo", image: require("../../assets/images/zoo.jpg") },
-  { id: "3", title: "Mysore Zoo", image: require("../../assets/images/mysorezoo.jpg") },
-  { id: "4", title: "Nehru Planetarium", image: require("../../assets/images/planetarium.jpg") },
-  { id: "5", title: "Legoland", image: require("../../assets/images/legoland.jpg") },
-  { id: "6", title: "Sentosa Island", image: require("../../assets/images/sentosa.jpg") },
-];
-
 export default function Home() {
   const router = useRouter();
 
@@ -123,7 +112,10 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
         {/* HEADER */}
         <View style={styles.header}>
           <View>
@@ -164,19 +156,27 @@ export default function Home() {
         {renderSection("Cold Places", coldPlaces)}
         {renderSection("Desert Destinations", deserts)}
         {renderSection("Amusement Parks", amusementParks)}
-        {renderSection("Kids & Family Favorites", kidsFavorites)}
 
-        <View style={{ height: 30 }} />
+        {/* 🔽 EXTRA SPACE ADDED TO AVOID BOTTOM TAB BAR OVERLAP */}
+        <View style={{ height: 80 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-/* ---------------- STYLES (UNCHANGED) ---------------- */
+/* ---------------- STYLES ---------------- */
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f8fafc" },
-  container: { flex: 1, paddingHorizontal: 16, paddingTop: 50 },
+
+  /* 🔧 MODIFIED HERE: paddingBottom added for bottom tab bar */
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 80, // 👈 prevents bottom navbar hiding content
+  },
+
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   greeting: { fontSize: 22, fontWeight: "700", color: "#0f172a" },
   subtitle: { color: "#64748b" },
