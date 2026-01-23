@@ -10,8 +10,9 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { placesData } from "../data/places";
 
-/* ---------------- CATEGORIES ---------------- */
+/* ---------------- CATEGORIES (UI ONLY) ---------------- */
 
 const categories = [
   { id: "1", name: "Beach", icon: "🏖️" },
@@ -24,98 +25,45 @@ const categories = [
   { id: "8", name: "City", icon: "🏙️" },
 ];
 
-/* ---------------- NEARBY PLACES ---------------- */
-
-const nearbyPlaces = [
-  { id: "1", title: "Marina Beach", image: require("../../assets/images/marina.jpg") },
-  { id: "2", title: "Mahabalipuram", image: require("../../assets/images/mahabalipuram.jpg") },
-  { id: "3", title: "Pondicherry", image: require("../../assets/images/pondicherry.jpg") },
-  { id: "4", title: "Goa Beach", image: require("../../assets/images/goa.jpg") },
-  { id: "5", title: "Bali", image: require("../../assets/images/bali.jpg") },
-  { id: "6", title: "Phuket", image: require("../../assets/images/phuket.jpg") },
-];
-
-/* ---------------- FALLS ---------------- */
-
-const falls = [
-  { id: "1", title: "Courtallam Falls", image: require("../../assets/images/courtallam.jpg") },
-  { id: "2", title: "Hogenakkal Falls", image: require("../../assets/images/hogenakkal.jpg") },
-  { id: "3", title: "Jog Falls", image: require("../../assets/images/jogfalls.jpg") },
-  { id: "4", title: "Athirappilly Falls", image: require("../../assets/images/athirappilly.jpg") },
-  { id: "5", title: "Niagara Falls", image: require("../../assets/images/niagara.jpg") },
-  { id: "6", title: "Victoria Falls", image: require("../../assets/images/victoria.jpg") },
-];
-
-/* ---------------- BEACHES ---------------- */
-
-const beaches = [
-  { id: "1", title: "Rameswaram Beach", image: require("../../assets/images/rameswaram.jpg") },
-  { id: "2", title: "Kanyakumari Beach", image: require("../../assets/images/kanyakumari.jpg") },
-  { id: "3", title: "Varkala Beach", image: require("../../assets/images/varkala.jpg") },
-  { id: "4", title: "Baga Beach", image: require("../../assets/images/baga.jpg") },
-  { id: "5", title: "Bondi Beach", image: require("../../assets/images/bondi.jpg") },
-  { id: "6", title: "Copacabana", image: require("../../assets/images/copacabana.jpg") },
-];
-
-/* ---------------- COLD PLACES ---------------- */
-
-const coldPlaces = [
-  { id: "1", title: "Ooty", image: require("../../assets/images/ooty.jpg") },
-  { id: "2", title: "Kodaikanal", image: require("../../assets/images/kodaikanal.jpg") },
-  { id: "3", title: "Manali", image: require("../../assets/images/manali.jpg") },
-  { id: "4", title: "Gulmarg", image: require("../../assets/images/gulmarg.jpg") },
-  { id: "5", title: "Swiss Alps", image: require("../../assets/images/swiss.jpg") },
-  { id: "6", title: "Reykjavik", image: require("../../assets/images/reykjavik.jpg") },
-];
-
-/* ---------------- DESERT ---------------- */
-
-const deserts = [
-  { id: "1", title: "Rameswaram Dunes", image: require("../../assets/images/rameswaramdunes.jpg") },
-  { id: "2", title: "Dhanushkodi Sands", image: require("../../assets/images/dhanushkodi.jpg") },
-  { id: "3", title: "Thar Desert", image: require("../../assets/images/thar.jpg") },
-  { id: "4", title: "Jaisalmer Safari", image: require("../../assets/images/jaisalmer.jpg") },
-  { id: "5", title: "Sahara Desert", image: require("../../assets/images/sahara.jpg") },
-  { id: "6", title: "Dubai Desert", image: require("../../assets/images/dubai_desert.jpg") },
-];
-
-/* ---------------- AMUSEMENT PARK ---------------- */
-
-const amusementParks = [
-  { id: "1", title: "Queens Land", image: require("../../assets/images/queensland.jpg") },
-  { id: "2", title: "Black Thunder", image: require("../../assets/images/blackthunder.jpg") },
-  { id: "3", title: "Wonderla", image: require("../../assets/images/wonderla.jpg") },
-  { id: "4", title: "Imagicaa", image: require("../../assets/images/imagicaa.jpg") },
-  { id: "5", title: "Disneyland", image: require("../../assets/images/disneyland.jpg") },
-  { id: "6", title: "Universal Studios", image: require("../../assets/images/universal.jpg") },
-];
-
 export default function Home() {
   const router = useRouter();
 
-  const renderSection = (title: string, data: any[]) => (
-    <>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{title}</Text>
-      </View>
+  const renderSection = (sectionTitle: string) => {
+    const data = placesData[sectionTitle] || [];
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {data.map((item) => (
-          <TouchableOpacity key={item.id} style={styles.placeCard}>
-            <Image source={item.image} style={styles.placeImage} />
-            <Text style={styles.placeTitle}>{item.title}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </>
-  );
+    if (!data.length) return null;
+
+    return (
+      <>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{sectionTitle}</Text>
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {data.map((item, index) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.placeCard}
+              activeOpacity={0.8}
+              onPress={() =>
+                router.push({
+                  pathname: "/place-details",
+                  params: { section: sectionTitle, index },
+                })
+              }
+            >
+              <Image source={item.image} style={styles.placeImage} />
+              <Text style={styles.placeTitle}>{item.title}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView
-        style={styles.container}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* HEADER */}
         <View style={styles.header}>
           <View>
@@ -133,10 +81,13 @@ export default function Home() {
 
         {/* SEARCH */}
         <View style={styles.searchBox}>
-          <TextInput placeholder="Search destinations..." style={styles.searchInput} />
+          <TextInput
+            placeholder="Search destinations..."
+            style={styles.searchInput}
+          />
         </View>
 
-        {/* CATEGORIES */}
+        {/* CATEGORIES (UI ONLY FOR NOW) */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Categories</Text>
         </View>
@@ -150,14 +101,15 @@ export default function Home() {
           ))}
         </ScrollView>
 
-        {renderSection("Nearby Places", nearbyPlaces)}
-        {renderSection("Famous Waterfalls", falls)}
-        {renderSection("Beaches", beaches)}
-        {renderSection("Cold Places", coldPlaces)}
-        {renderSection("Desert Destinations", deserts)}
-        {renderSection("Amusement Parks", amusementParks)}
+        {/* 🔥 ALL SECTIONS FROM places.ts */}
+        {renderSection("Nearby Places")}
+        {renderSection("Famous Waterfalls")}
+        {renderSection("Beaches")}
+        {renderSection("Cold Places")}
+        {renderSection("Desert Destinations")}
+        {renderSection("Amusement Parks")}
 
-        {/* 🔽 EXTRA SPACE ADDED TO AVOID BOTTOM TAB BAR OVERLAP */}
+        {/* Bottom spacing for tab bar */}
         <View style={{ height: 80 }} />
       </ScrollView>
     </SafeAreaView>
@@ -169,17 +121,27 @@ export default function Home() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f8fafc" },
 
-  /* 🔧 MODIFIED HERE: paddingBottom added for bottom tab bar */
   container: {
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 50,
-    paddingBottom: 80, // 👈 prevents bottom navbar hiding content
+    paddingBottom: 80,
   },
 
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  greeting: { fontSize: 22, fontWeight: "700", color: "#0f172a" },
-  subtitle: { color: "#64748b" },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  greeting: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#0f172a",
+  },
+  subtitle: {
+    color: "#64748b",
+  },
+
   avatar: {
     width: 40,
     height: 40,
@@ -188,10 +150,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  searchBox: { backgroundColor: "#fff", borderRadius: 14, marginVertical: 16, paddingHorizontal: 14 },
-  searchInput: { height: 44 },
-  sectionHeader: { flexDirection: "row", justifyContent: "space-between", marginVertical: 12 },
-  sectionTitle: { fontSize: 18, fontWeight: "700" },
+
+  searchBox: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    marginVertical: 16,
+    paddingHorizontal: 14,
+  },
+  searchInput: {
+    height: 44,
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
   categoryCard: {
     width: 90,
     height: 90,
@@ -201,9 +180,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
-  categoryIcon: { fontSize: 26 },
-  categoryText: { color: "#fff", fontSize: 12, marginTop: 6 },
-  placeCard: { width: 170, backgroundColor: "#fff", borderRadius: 18, padding: 10, marginRight: 14 },
-  placeImage: { width: "100%", height: 110, borderRadius: 14 },
-  placeTitle: { marginTop: 8, fontSize: 15, fontWeight: "600" },
+  categoryIcon: {
+    fontSize: 26,
+  },
+  categoryText: {
+    color: "#fff",
+    fontSize: 12,
+    marginTop: 6,
+  },
+
+  placeCard: {
+    width: 170,
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    padding: 10,
+    marginRight: 14,
+  },
+  placeImage: {
+    width: "100%",
+    height: 110,
+    borderRadius: 14,
+  },
+  placeTitle: {
+    marginTop: 8,
+    fontSize: 15,
+    fontWeight: "600",
+  },
 });
