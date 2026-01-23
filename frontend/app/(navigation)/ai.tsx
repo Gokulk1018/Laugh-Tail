@@ -3,175 +3,305 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   TextInput,
+  TouchableOpacity,
+  Image,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+const { height } = Dimensions.get("window");
+
+/* -------- STATIC NEARBY PLACES (FOR NOW) -------- */
+
+const nearbyPlaces = [
+  {
+    id: "1",
+    name: "Marina Beach",
+    image: require("../../assets/images/home1.jpg"),
+    rating: 4.5,
+  },
+  {
+    id: "2",
+    name: "Mahabalipuram",
+    image: require("../../assets/images/home2.jpg"),
+    rating: 4.3,
+  },
+  {
+    id: "3",
+    name: "Yelagiri Hills",
+    image: require("../../assets/images/home3.jpg"),
+    rating: 4.1,
+  },
+  {
+    id: "4",
+    name: "Pondicherry",
+    image: require("../../assets/images/home4.jpg"),
+    rating: 4.6,
+  },
+];
+
 export default function AIPage() {
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      
-      {/* HEADER */}
-      <View style={styles.header}>
-        <Ionicons name="sparkles-outline" size={26} color="#2563eb" />
-        <Text style={styles.title}>AI Travel Assistant</Text>
-        <Text style={styles.subtitle}>
-          Plan smarter, travel better ✨
-        </Text>
-      </View>
+    <View style={styles.container}>
+      {/* ================= CHAT CARD ================= */}
+      <View style={styles.chatWrapper}>
+        <View style={styles.chatCard}>
+          {/* AI HEADER */}
+          <View style={styles.aiHeader}>
+            <View style={styles.aiIconWrap}>
+              <Ionicons name="sparkles" size={18} color="#2563eb" />
+            </View>
+            <Text style={styles.aiTitle}>AI Assistant</Text>
+          </View>
 
-      {/* INPUT CARD */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Ask AI</Text>
+          {/* CHAT MESSAGES */}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.chat}
+          >
+            {/* AI MESSAGE */}
+            <View style={styles.aiRow}>
+              <View style={styles.aiBubble}>
+                <Text style={styles.aiText}>
+                  Hi Gokul 👋 I’m your AI travel assistant.
+                  Tell me what kind of trip you’re planning 😊
+                </Text>
+              </View>
+            </View>
 
-        <TextInput
-          placeholder="Enter destination or mood (e.g. beach, adventure)"
-          style={styles.input}
-        />
+            {/* USER MESSAGE */}
+            <View style={styles.userRow}>
+              <View style={styles.userBubble}>
+                <Text style={styles.userText}>
+                  I want a peaceful place nearby
+                </Text>
+              </View>
+            </View>
 
-        <View style={styles.row}>
-          <TextInput placeholder="Season" style={styles.smallInput} />
-          <TextInput placeholder="Budget" style={styles.smallInput} />
+            {/* AI RESPONSE */}
+            <View style={styles.aiRow}>
+              <View style={styles.aiBubble}>
+                <Text style={styles.aiText}>
+                  Got it 🌿 I’ve analyzed your request and found some nearby
+                  places that match your mood. You can explore them below 👇
+                </Text>
+              </View>
+            </View>
+          </ScrollView>
+
+          {/* INPUT BAR */}
+          <View style={styles.inputBar}>
+            <TextInput
+              placeholder="Type your message..."
+              style={styles.input}
+            />
+            <TouchableOpacity style={styles.sendBtn}>
+              <Ionicons name="send" size={18} color="#ffffff" />
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <TouchableOpacity style={styles.button}>
-          <Ionicons name="sparkles" size={18} color="#fff" />
-          <Text style={styles.buttonText}>Generate Plan</Text>
-        </TouchableOpacity>
       </View>
 
-      {/* AI SUGGESTIONS */}
-      <Text style={styles.sectionTitle}>AI Suggestions</Text>
+      {/* ================= PLACES SECTION ================= */}
+      <View style={styles.placesSection}>
+        <Text style={styles.sectionTitle}>Nearby Places 📍</Text>
 
-      <View style={styles.suggestionCard}>
-        <Text style={styles.placeName}>🏝️ Andaman Islands</Text>
-        <Text style={styles.reason}>
-          Best for summer, beaches, and budget-friendly travel.
-        </Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.placesRow}
+        >
+          {nearbyPlaces.map((place) => (
+            <View key={place.id} style={styles.placeCard}>
+              <Image source={place.image} style={styles.placeImage} />
+
+              <View style={styles.placeInfo}>
+                <Text style={styles.placeName}>{place.name}</Text>
+
+                <View style={styles.ratingRow}>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Ionicons
+                      key={i}
+                      name={
+                        i <= Math.round(place.rating)
+                          ? "star"
+                          : "star-outline"
+                      }
+                      size={14}
+                      color="#facc15"
+                    />
+                  ))}
+                  <Text style={styles.ratingText}>{place.rating}</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
       </View>
-
-      <View style={styles.suggestionCard}>
-        <Text style={styles.placeName}>⛰️ Manali</Text>
-        <Text style={styles.reason}>
-          Ideal for adventure and mountain lovers.
-        </Text>
-      </View>
-
-      {/* AI PLAN */}
-      <Text style={styles.sectionTitle}>Your AI Travel Plan</Text>
-
-      <View style={styles.planCard}>
-        <Text style={styles.planDay}>Day 1</Text>
-        <Text style={styles.planText}>
-          Arrival, hotel check-in, local sightseeing
-        </Text>
-
-        <Text style={styles.planDay}>Day 2</Text>
-        <Text style={styles.planText}>
-          Adventure activities and nature exploration
-        </Text>
-      </View>
-
-      <View style={{ height: 30 }} />
-    </ScrollView>
+    </View>
   );
 }
+
+/* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8fafc",
+  },
+
+  /* CHAT CARD */
+  chatWrapper: {
+    height: height * 0.55,
     padding: 16,
   },
-  header: {
-    alignItems: "center",
-    marginTop: 20,
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#0f172a",
-    marginTop: 6,
-  },
-  subtitle: {
-    color: "#64748b",
-    marginTop: 4,
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 20,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 10,
-  },
-  input: {
-    backgroundColor: "#f1f5f9",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    height: 44,
-    marginBottom: 10,
-  },
-  row: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  smallInput: {
+  chatCard: {
     flex: 1,
-    backgroundColor: "#f1f5f9",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    height: 44,
+    backgroundColor: "#ffffff",
+    borderRadius: 22,
+    borderWidth: 0.5,
+    borderColor: "#e5e7eb",
+    overflow: "hidden",
+
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  button: {
+
+  /* AI HEADER */
+  aiHeader: {
     flexDirection: "row",
-    backgroundColor: "#2563eb",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e5e7eb",
+  },
+  aiIconWrap: {
+    width: 28,
+    height: 28,
     borderRadius: 14,
-    height: 48,
+    backgroundColor: "#e0e7ff",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 14,
-    gap: 8,
   },
-  buttonText: {
-    color: "#fff",
+  aiTitle: {
+    marginLeft: 8,
+    fontSize: 15,
     fontWeight: "700",
+    color: "#1e293b",
+  },
+
+  chat: {
+    padding: 16,
+    paddingBottom: 80,
+  },
+
+  aiRow: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    marginBottom: 10,
+  },
+  aiBubble: {
+    maxWidth: "80%",
+    backgroundColor: "#e0e7ff",
+    borderRadius: 16,
+    padding: 12,
+  },
+  aiText: {
+    color: "#1e293b",
+    lineHeight: 20,
+  },
+
+  userRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: 10,
+  },
+  userBubble: {
+    maxWidth: "80%",
+    backgroundColor: "#2563eb",
+    borderRadius: 16,
+    padding: 12,
+  },
+  userText: {
+    color: "#ffffff",
+    lineHeight: 20,
+  },
+
+  /* INPUT */
+  inputBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#ffffff",
+    borderTopWidth: 0.5,
+    borderTopColor: "#e5e7eb",
+  },
+  input: {
+    flex: 1,
+    height: 44,
+    backgroundColor: "#f1f5f9",
+    borderRadius: 22,
+    paddingHorizontal: 16,
+  },
+  sendBtn: {
+    marginLeft: 10,
+    backgroundColor: "#2563eb",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  /* PLACES */
+  placesSection: {
+    flex: 1,
+    paddingTop: 10,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "800",
-    marginBottom: 12,
+    paddingHorizontal: 16,
+    marginBottom: 10,
   },
-  suggestionCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 12,
+  placesRow: {
+    paddingHorizontal: 16,
+    gap: 14,
+  },
+  placeCard: {
+    width: 160,
+    backgroundColor: "#ffffff",
+    borderRadius: 18,
+    overflow: "hidden",
+  },
+  placeImage: {
+    width: "100%",
+    height: 110,
+  },
+  placeInfo: {
+    padding: 10,
   },
   placeName: {
-    fontSize: 16,
     fontWeight: "700",
+    fontSize: 14,
+    marginBottom: 4,
   },
-  reason: {
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+  },
+  ratingText: {
+    fontSize: 12,
     color: "#475569",
-    marginTop: 4,
-  },
-  planCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 14,
-  },
-  planDay: {
-    fontWeight: "700",
-    marginTop: 8,
-  },
-  planText: {
-    color: "#475569",
-    marginBottom: 6,
+    marginLeft: 4,
   },
 });
