@@ -72,6 +72,9 @@ export default function NavigationLayout() {
 
         {/* hidden */}
         <Tabs.Screen name="setting" options={{ href: null }} />
+        <Tabs.Screen name="notifications" options={{ href: null }} />
+        <Tabs.Screen name="account" options={{ href: null }} />
+        <Tabs.Screen name="help" options={{ href: null }} />
       </Tabs>
     </SafeAreaView>
   );

@@ -6,19 +6,19 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
-  SafeAreaView,
   Modal,
   Pressable,
 } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Profile() {
   const router = useRouter();
   const [showLogout, setShowLogout] = useState(false);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f8fafc" }}>
+    <View style={{ flex: 1, backgroundColor: "#f8fafc" }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* 🔝 HERO SECTION */}
         <ImageBackground
@@ -93,13 +93,33 @@ export default function Profile() {
           </ScrollView>
         </View>
 
-        {/* ⚙️ SETTINGS */}
+        {/* ⚙️ ACCOUNT & SUPPORT */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Settings</Text>
+          <Text style={styles.sectionTitle}>Account & Support</Text>
 
-          <View style={styles.settingItem}><Text>Account</Text></View>
-          <View style={styles.settingItem}><Text>Notifications</Text></View>
-          <View style={styles.settingItem}><Text>Help & Support</Text></View>
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => router.push("/(navigation)/account")}
+          >
+            <Text style={styles.settingText}>Account</Text>
+            <Ionicons name="chevron-forward" size={20} color="#64748b" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => router.push("/(navigation)/notifications")}
+          >
+            <Text style={styles.settingText}>Notifications</Text>
+            <Ionicons name="chevron-forward" size={20} color="#64748b" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => router.push("/(navigation)/help")}
+          >
+            <Text style={styles.settingText}>Help & Support</Text>
+            <Ionicons name="chevron-forward" size={20} color="#64748b" />
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.logoutBtn}
@@ -145,9 +165,11 @@ export default function Profile() {
           </View>
         </Pressable>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
+
+/* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
   hero: {
@@ -157,7 +179,6 @@ const styles = StyleSheet.create({
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.35)",
-    pointerEvents: "none",
   },
   profileBox: {
     alignItems: "center",
@@ -244,12 +265,22 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     marginRight: 12,
   },
+
+  /* SETTINGS LIST */
   settingItem: {
     backgroundColor: "#fff",
     padding: 16,
     borderRadius: 16,
     marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
+  settingText: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
   logoutBtn: {
     marginTop: 16,
     backgroundColor: "#ef4444",
@@ -261,6 +292,8 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
   },
+
+  /* MODAL */
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",

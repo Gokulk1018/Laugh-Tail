@@ -50,7 +50,7 @@ export default function AIPage() {
           {/* AI HEADER */}
           <View style={styles.aiHeader}>
             <View style={styles.aiIconWrap}>
-              <Ionicons name="sparkles" size={18} color="#2563eb" />
+              <Ionicons name="sparkles" size={18} color="#000000" />
             </View>
             <Text style={styles.aiTitle}>AI Assistant</Text>
           </View>
@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
   chat: {
     padding: 16,
     paddingBottom: 80,
+    
   },
 
   aiRow: {
@@ -206,12 +207,12 @@ const styles = StyleSheet.create({
   },
   aiBubble: {
     maxWidth: "80%",
-    backgroundColor: "#e0e7ff",
+    backgroundColor: "#e6e7e9",
     borderRadius: 16,
     padding: 12,
   },
   aiText: {
-    color: "#1e293b",
+    color: "#0e1012",
     lineHeight: 20,
   },
 
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
   },
   userBubble: {
     maxWidth: "80%",
-    backgroundColor: "#2563eb",
+    backgroundColor: "#080808",
     borderRadius: 16,
     padding: 12,
   },
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
   },
   sendBtn: {
     marginLeft: 10,
-    backgroundColor: "#2563eb",
+    backgroundColor: "#000000",
     width: 44,
     height: 44,
     borderRadius: 22,
