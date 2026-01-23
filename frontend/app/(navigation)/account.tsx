@@ -7,6 +7,7 @@ import {
   Modal,
   TextInput,
   Pressable,
+  Switch,
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,7 +15,13 @@ import { useRouter } from "expo-router";
 
 export default function Account() {
   const router = useRouter();
+
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  // 🔐 ACCOUNT TOGGLES
+  const [isPublicProfile, setIsPublicProfile] = useState(true);
+  const [showProfileViews, setShowProfileViews] = useState(true);
+  const [allowReplies, setAllowReplies] = useState(true);
 
   return (
     <View style={styles.container}>
@@ -66,7 +73,36 @@ export default function Account() {
           </TouchableOpacity>
         </View>
 
-        {/* PRIVACY */}
+        {/* 🔐 PRIVACY & VISIBILITY */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Privacy & Visibility</Text>
+
+          <View style={styles.toggleRow}>
+            <Text style={styles.toggleText}>Public Profile</Text>
+            <Switch
+              value={isPublicProfile}
+              onValueChange={setIsPublicProfile}
+            />
+          </View>
+
+          <View style={styles.toggleRow}>
+            <Text style={styles.toggleText}>Show Profile View Count</Text>
+            <Switch
+              value={showProfileViews}
+              onValueChange={setShowProfileViews}
+            />
+          </View>
+
+          <View style={styles.toggleRow}>
+            <Text style={styles.toggleText}>Allow Replies to My Reviews</Text>
+            <Switch
+              value={allowReplies}
+              onValueChange={setAllowReplies}
+            />
+          </View>
+        </View>
+
+        {/* DATA INFO */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Privacy & Data</Text>
 
@@ -184,6 +220,17 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     fontWeight: "600",
+  },
+
+  toggleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+  toggleText: {
+    fontSize: 14,
+    color: "#0f172a",
   },
 
   infoRow: {

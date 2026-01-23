@@ -36,9 +36,13 @@ export default function Profile() {
             <Text style={styles.name}>Gokul K.</Text>
             <Text style={styles.bio}>Explorer | Mountains & Beaches</Text>
 
-            <TouchableOpacity style={styles.editBtn}>
-              <Text style={styles.editText}>Edit Profile</Text>
-            </TouchableOpacity>
+            <TouchableOpacity
+  style={styles.editBtn}
+  onPress={() => router.push("/(navigation)/edit-profile")}
+>
+  <Text style={styles.editText}>Edit Profile</Text>
+</TouchableOpacity>
+
           </View>
         </ImageBackground>
 
