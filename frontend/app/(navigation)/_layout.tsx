@@ -77,6 +77,7 @@ export default function NavigationLayout() {
         <Tabs.Screen name="help" options={{ href: null }} />
         <Tabs.Screen name="edit-profile" options={{ href: null }} />
         <Tabs.Screen name="place-details" options={{ href: null }} />
+        <Tabs.Screen name="category-details" options={{ href: null }} />
       </Tabs>
     </SafeAreaView>
   );

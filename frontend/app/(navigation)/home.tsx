@@ -19,19 +19,19 @@ import { fetchImageForPlace } from "../services/unsplashApi";
 /* ---------------- TYPES ---------------- */
 type PlaceItem = {
   name: string;
-  image: string | null;
+  image: string;
 };
 
-/* ---------------- CATEGORIES (UI ONLY) ---------------- */
+/* ---------------- CATEGORIES (EXPANDED) ---------------- */
 const categories = [
-  { id: "1", name: "Beach", icon: "🏖️" },
-  { id: "2", name: "Mountains", icon: "⛰️" },
-  { id: "3", name: "Snow", icon: "❄️" },
-  { id: "4", name: "Adventure", icon: "🧗" },
-  { id: "5", name: "Forest", icon: "🌲" },
-  { id: "6", name: "Desert", icon: "🏜️" },
+  { id: "1", name: "Adventure", icon: "🧗" },
+  { id: "2", name: "Forest", icon: "🌲" },
+  { id: "3", name: "City", icon: "🏙️" },
+  { id: "4", name: "Beach", icon: "🏖️" },
+  { id: "5", name: "Desert", icon: "🏜️" },
+  { id: "6", name: "Snow", icon: "❄️" },
   { id: "7", name: "Island", icon: "🏝️" },
-  { id: "8", name: "City", icon: "🏙️" },
+  { id: "8", name: "Mountain", icon: "⛰️" },
 ];
 
 export default function Home() {
@@ -40,81 +40,74 @@ export default function Home() {
   const [data, setData] = useState<Record<string, PlaceItem[]>>({});
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- LOAD ALL SECTIONS ---------------- */
+  /* ---------------- LOAD SECTIONS (FILTER NO IMAGE) ---------------- */
   useEffect(() => {
-    const loadAllSections = async () => {
+    const loadSections = async () => {
       setLoading(true);
-      console.log("HOME SCREEN LOADED (HYBRID)");
-
       const finalData: Record<string, PlaceItem[]> = {};
 
       for (const sectionTitle of Object.keys(sections)) {
-        const places = sections[sectionTitle];
-        const sectionItems: PlaceItem[] = [];
+        const places = sections[sectionTitle] ?? [];
+        const items: PlaceItem[] = [];
 
-        for (const placeName of places) {
-          const imageData = await fetchImageForPlace(placeName);
-          sectionItems.push({
-            name: placeName,
-            image: imageData?.urls?.small || null,
-          });
+        for (const place of places) {
+          const img = await fetchImageForPlace(place);
+
+          // ✅ FILTER: only add if image exists
+          if (img?.urls?.small) {
+            items.push({
+              name: place,
+              image: img.urls.small,
+            });
+          }
         }
 
-        finalData[sectionTitle] = sectionItems;
+        // only keep section if it has data
+        if (items.length > 0) {
+          finalData[sectionTitle] = items;
+        }
       }
 
       setData(finalData);
       setLoading(false);
     };
 
-    loadAllSections();
+    loadSections();
   }, []);
 
   /* ---------------- RENDER SECTION ---------------- */
-  const renderSection = (sectionTitle: string, items: PlaceItem[]) => {
-    return (
-      <View key={sectionTitle}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{sectionTitle}</Text>
-        </View>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {items.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.placeCard}
-              activeOpacity={0.8}
-              onPress={() =>
-                router.push({
-                  pathname: "/place-details",
-                  params: {
-                    name: item.name,
-                    image: item.image,
-                    section: sectionTitle,
-                  },
-                })
-              }
-            >
-              {item.image ? (
-                <Image
-                  source={{ uri: item.image }}
-                  style={styles.placeImage}
-                />
-              ) : (
-                <View style={styles.imagePlaceholder}>
-                  <Text>No Image</Text>
-                </View>
-              )}
-
-              <Text numberOfLines={1} style={styles.placeTitle}>
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+  const renderSection = (title: string, items: PlaceItem[]) => (
+    <View key={title}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{title}</Text>
       </View>
-    );
-  };
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {items.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.placeCard}
+            activeOpacity={0.8}
+            onPress={() =>
+              router.push({
+                pathname: "/place-details",
+                params: {
+                  name: item.name,
+                  image: item.image,
+                  section: title,
+                },
+              })
+            }
+          >
+            <Image source={{ uri: item.image }} style={styles.placeImage} />
+            <Text numberOfLines={1} style={styles.placeTitle}>
+              {item.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -149,10 +142,19 @@ export default function Home() {
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((item) => (
-            <View key={item.id} style={styles.categoryCard}>
+            <TouchableOpacity
+              key={item.id}
+              style={styles.categoryCard}
+              onPress={() =>
+                router.push({
+                  pathname: "/category-details",
+                  params: { category: item.name },
+                })
+              }
+            >
               <Text style={styles.categoryIcon}>{item.icon}</Text>
               <Text style={styles.categoryText}>{item.name}</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </ScrollView>
 
@@ -175,27 +177,15 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f8fafc" },
-
-  container: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 50,
-    paddingBottom: 80,
-  },
+  container: { flex: 1, paddingHorizontal: 16, paddingTop: 50 },
 
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  greeting: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#0f172a",
-  },
-  subtitle: {
-    color: "#64748b",
-  },
+  greeting: { fontSize: 22, fontWeight: "700", color: "#0f172a" },
+  subtitle: { color: "#64748b" },
 
   avatar: {
     width: 40,
@@ -212,19 +202,10 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     paddingHorizontal: 14,
   },
-  searchInput: {
-    height: 44,
-  },
+  searchInput: { height: 44 },
 
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
+  sectionHeader: { marginVertical: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: "700" },
 
   categoryCard: {
     width: 90,
@@ -235,14 +216,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
-  categoryIcon: {
-    fontSize: 26,
-  },
-  categoryText: {
-    color: "#fff",
-    fontSize: 12,
-    marginTop: 6,
-  },
+  categoryIcon: { fontSize: 26 },
+  categoryText: { color: "#fff", fontSize: 12, marginTop: 6 },
 
   placeCard: {
     width: 170,
@@ -251,22 +226,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 14,
   },
-  placeImage: {
-    width: "100%",
-    height: 110,
-    borderRadius: 14,
-  },
-  imagePlaceholder: {
-    width: "100%",
-    height: 110,
-    borderRadius: 14,
-    backgroundColor: "#e5e7eb",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeTitle: {
-    marginTop: 8,
-    fontSize: 14,
-    fontWeight: "600",
-  },
+  placeImage: { width: "100%", height: 110, borderRadius: 14 },
+  placeTitle: { marginTop: 8, fontSize: 14, fontWeight: "600" },
 });
