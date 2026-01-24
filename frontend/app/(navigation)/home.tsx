@@ -1,3 +1,4 @@
+// app/(navigation)/home.tsx
 import {
   View,
   Text,
@@ -16,13 +17,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { sections } from "../data/sections";
 import { fetchImageForPlace } from "../services/unsplashApi";
 
-/* ---------------- TYPES ---------------- */
 type PlaceItem = {
   name: string;
   image: string;
 };
 
-/* ---------------- CATEGORIES (EXPANDED) ---------------- */
 const categories = [
   { id: "1", name: "Adventure", icon: "🧗" },
   { id: "2", name: "Forest", icon: "🌲" },
@@ -36,78 +35,32 @@ const categories = [
 
 export default function Home() {
   const router = useRouter();
-
   const [data, setData] = useState<Record<string, PlaceItem[]>>({});
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- LOAD SECTIONS (FILTER NO IMAGE) ---------------- */
   useEffect(() => {
-    const loadSections = async () => {
-      setLoading(true);
-      const finalData: Record<string, PlaceItem[]> = {};
+    const load = async () => {
+      const final: Record<string, PlaceItem[]> = {};
 
-      for (const sectionTitle of Object.keys(sections)) {
-        const places = sections[sectionTitle] ?? [];
+      for (const section of Object.keys(sections)) {
         const items: PlaceItem[] = [];
 
-        for (const place of places) {
+        for (const place of sections[section]) {
           const img = await fetchImageForPlace(place);
-
-          // ✅ FILTER: only add if image exists
           if (img?.urls?.small) {
-            items.push({
-              name: place,
-              image: img.urls.small,
-            });
+            items.push({ name: place, image: img.urls.small });
           }
         }
 
-        // only keep section if it has data
-        if (items.length > 0) {
-          finalData[sectionTitle] = items;
-        }
+        final[section] = items;
       }
 
-      setData(finalData);
+      setData(final);
       setLoading(false);
     };
 
-    loadSections();
+    load();
   }, []);
-
-  /* ---------------- RENDER SECTION ---------------- */
-  const renderSection = (title: string, items: PlaceItem[]) => (
-    <View key={title}>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{title}</Text>
-      </View>
-
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {items.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.placeCard}
-            activeOpacity={0.8}
-            onPress={() =>
-              router.push({
-                pathname: "/place-details",
-                params: {
-                  name: item.name,
-                  image: item.image,
-                  section: title,
-                },
-              })
-            }
-          >
-            <Image source={{ uri: item.image }} style={styles.placeImage} />
-            <Text numberOfLines={1} style={styles.placeTitle}>
-              {item.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -123,7 +76,7 @@ export default function Home() {
             style={styles.avatar}
             onPress={() => router.push("/(navigation)/setting")}
           >
-            <Ionicons name="settings-outline" size={22} color="#0f172a" />
+            <Ionicons name="settings-outline" size={22} />
           </TouchableOpacity>
         </View>
 
@@ -132,28 +85,35 @@ export default function Home() {
           <TextInput
             placeholder="Search destinations..."
             style={styles.searchInput}
+            returnKeyType="search"
+            onSubmitEditing={(e) => {
+              const q = e.nativeEvent.text.trim();
+              if (q) {
+                router.push({
+                  pathname: "/(navigation)/search",
+                  params: { q },
+                });
+              }
+            }}
           />
         </View>
 
         {/* CATEGORIES */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-        </View>
-
+        <Text style={styles.sectionTitle}>Categories</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {categories.map((item) => (
+          {categories.map((c) => (
             <TouchableOpacity
-              key={item.id}
+              key={c.id}
               style={styles.categoryCard}
               onPress={() =>
                 router.push({
-                  pathname: "/category-details",
-                  params: { category: item.name },
+                  pathname: "/(navigation)/category-details",
+                  params: { category: c.name },
                 })
               }
             >
-              <Text style={styles.categoryIcon}>{item.icon}</Text>
-              <Text style={styles.categoryText}>{item.name}</Text>
+              <Text style={styles.categoryIcon}>{c.icon}</Text>
+              <Text style={styles.categoryText}>{c.name}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -162,9 +122,34 @@ export default function Home() {
         {loading ? (
           <ActivityIndicator size="large" style={{ marginTop: 40 }} />
         ) : (
-          Object.entries(data).map(([title, items]) =>
-            renderSection(title, items)
-          )
+          Object.entries(data).map(([title, items]) => (
+            <View key={title}>
+              <Text style={styles.sectionTitle}>{title}</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {items.map((p, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={styles.placeCard}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/(navigation)/place-details",
+                        params: {
+                          name: p.name,
+                          image: p.image,
+                          section: title,
+                        },
+                      })
+                    }
+                  >
+                    <Image source={{ uri: p.image }} style={styles.placeImage} />
+                    <Text numberOfLines={1} style={styles.placeTitle}>
+                      {p.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          ))
         )}
 
         <View style={{ height: 80 }} />
@@ -173,18 +158,16 @@ export default function Home() {
   );
 }
 
-/* ---------------- STYLES ---------------- */
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f8fafc" },
-  container: { flex: 1, paddingHorizontal: 16, paddingTop: 50 },
+  container: { padding: 16, paddingTop: 50 },
 
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  greeting: { fontSize: 22, fontWeight: "700", color: "#0f172a" },
+  greeting: { fontSize: 22, fontWeight: "700" },
   subtitle: { color: "#64748b" },
 
   avatar: {
@@ -199,21 +182,24 @@ const styles = StyleSheet.create({
   searchBox: {
     backgroundColor: "#fff",
     borderRadius: 14,
-    marginVertical: 16,
     paddingHorizontal: 14,
+    marginVertical: 16,
   },
   searchInput: { height: 44 },
 
-  sectionHeader: { marginVertical: 12 },
-  sectionTitle: { fontSize: 18, fontWeight: "700" },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginVertical: 12,
+  },
 
   categoryCard: {
     width: 90,
     height: 90,
     backgroundColor: "#040404",
     borderRadius: 45,
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
     marginRight: 12,
   },
   categoryIcon: { fontSize: 26 },
@@ -227,5 +213,5 @@ const styles = StyleSheet.create({
     marginRight: 14,
   },
   placeImage: { width: "100%", height: 110, borderRadius: 14 },
-  placeTitle: { marginTop: 8, fontSize: 14, fontWeight: "600" },
+  placeTitle: { marginTop: 8, fontWeight: "600" },
 });
