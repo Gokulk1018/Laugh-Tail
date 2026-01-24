@@ -12,42 +12,109 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchPlacesByCategory } from "../services/unsplashApi";
+
+import { sections } from "../data/sections";
+import { fetchImageForPlace } from "../services/unsplashApi";
+
+/* ---------------- TYPES ---------------- */
+type PlaceItem = {
+  name: string;
+  image: string | null;
+};
 
 /* ---------------- CATEGORIES (UI ONLY) ---------------- */
-
 const categories = [
-  { id: "1", name: "Beach", query: "beach", icon: "🏖️" },
-  { id: "2", name: "Mountains", query: "mountain", icon: "⛰️" },
-  { id: "3", name: "Snow", query: "snow", icon: "❄️" },
-  { id: "4", name: "Adventure", query: "adventure travel", icon: "🧗" },
-  { id: "5", name: "Forest", query: "forest", icon: "🌲" },
-  { id: "6", name: "Desert", query: "desert", icon: "🏜️" },
-  { id: "7", name: "Island", query: "island", icon: "🏝️" },
-  { id: "8", name: "City", query: "city travel", icon: "🏙️" },
+  { id: "1", name: "Beach", icon: "🏖️" },
+  { id: "2", name: "Mountains", icon: "⛰️" },
+  { id: "3", name: "Snow", icon: "❄️" },
+  { id: "4", name: "Adventure", icon: "🧗" },
+  { id: "5", name: "Forest", icon: "🌲" },
+  { id: "6", name: "Desert", icon: "🏜️" },
+  { id: "7", name: "Island", icon: "🏝️" },
+  { id: "8", name: "City", icon: "🏙️" },
 ];
 
 export default function Home() {
   const router = useRouter();
 
-  const [places, setPlaces] = useState<any[]>([]);
+  const [data, setData] = useState<Record<string, PlaceItem[]>>({});
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState("beach");
 
-  /* ---------------- FETCH FROM UNSPLASH ---------------- */
-
+  /* ---------------- LOAD ALL SECTIONS ---------------- */
   useEffect(() => {
-    const loadPlaces = async () => {
+    const loadAllSections = async () => {
       setLoading(true);
-      console.log("HOME SCREEN LOADED");
-      const data = await fetchPlacesByCategory(activeCategory);
-      console.log("DATA IN HOME:", data);
-      setPlaces(data);
+      console.log("HOME SCREEN LOADED (HYBRID)");
+
+      const finalData: Record<string, PlaceItem[]> = {};
+
+      for (const sectionTitle of Object.keys(sections)) {
+        const places = sections[sectionTitle];
+        const sectionItems: PlaceItem[] = [];
+
+        for (const placeName of places) {
+          const imageData = await fetchImageForPlace(placeName);
+          sectionItems.push({
+            name: placeName,
+            image: imageData?.urls?.small || null,
+          });
+        }
+
+        finalData[sectionTitle] = sectionItems;
+      }
+
+      setData(finalData);
       setLoading(false);
     };
 
-    loadPlaces();
-  }, [activeCategory]);
+    loadAllSections();
+  }, []);
+
+  /* ---------------- RENDER SECTION ---------------- */
+  const renderSection = (sectionTitle: string, items: PlaceItem[]) => {
+    return (
+      <View key={sectionTitle}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{sectionTitle}</Text>
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {items.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.placeCard}
+              activeOpacity={0.8}
+              onPress={() =>
+                router.push({
+                  pathname: "/place-details",
+                  params: {
+                    name: item.name,
+                    image: item.image,
+                    section: sectionTitle,
+                  },
+                })
+              }
+            >
+              {item.image ? (
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.placeImage}
+                />
+              ) : (
+                <View style={styles.imagePlaceholder}>
+                  <Text>No Image</Text>
+                </View>
+              )}
+
+              <Text numberOfLines={1} style={styles.placeTitle}>
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -82,54 +149,20 @@ export default function Home() {
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={[
-                styles.categoryCard,
-                activeCategory === item.query && styles.activeCategory,
-              ]}
-              onPress={() => setActiveCategory(item.query)}
-            >
+            <View key={item.id} style={styles.categoryCard}>
               <Text style={styles.categoryIcon}>{item.icon}</Text>
               <Text style={styles.categoryText}>{item.name}</Text>
-            </TouchableOpacity>
+            </View>
           ))}
         </ScrollView>
 
-        {/* PLACES FROM API */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Popular Places</Text>
-        </View>
-
+        {/* SECTIONS */}
         {loading ? (
-          <ActivityIndicator size="large" style={{ marginTop: 30 }} />
+          <ActivityIndicator size="large" style={{ marginTop: 40 }} />
         ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {places.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.placeCard}
-                activeOpacity={0.8}
-                onPress={() =>
-                  router.push({
-                    pathname: "/place-details",
-                    params: {
-                      image: item.urls.regular,
-                      title: item.alt_description || "Beautiful place",
-                    },
-                  })
-                }
-              >
-                <Image
-                  source={{ uri: item.urls.small }}
-                  style={styles.placeImage}
-                />
-                <Text numberOfLines={1} style={styles.placeTitle}>
-                  {item.alt_description || "Beautiful place"}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          Object.entries(data).map(([title, items]) =>
+            renderSection(title, items)
+          )
         )}
 
         <View style={{ height: 80 }} />
@@ -201,10 +234,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
-    opacity: 0.6,
-  },
-  activeCategory: {
-    opacity: 1,
   },
   categoryIcon: {
     fontSize: 26,
@@ -226,6 +255,14 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 110,
     borderRadius: 14,
+  },
+  imagePlaceholder: {
+    width: "100%",
+    height: 110,
+    borderRadius: 14,
+    backgroundColor: "#e5e7eb",
+    justifyContent: "center",
+    alignItems: "center",
   },
   placeTitle: {
     marginTop: 8,
