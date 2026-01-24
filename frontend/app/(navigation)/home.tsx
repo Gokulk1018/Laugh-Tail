@@ -30,8 +30,6 @@ const categories = [
   { id: "6", name: "Snow", icon: "❄️" },
   { id: "7", name: "Island", icon: "🏝️" },
   { id: "8", name: "Mountain", icon: "⛰️" },
-
-  // ✅ NEW
   { id: "9", name: "Temple", icon: "🛕" },
   { id: "10", name: "Museum & Forts", icon: "🏰" },
 ];
@@ -40,6 +38,7 @@ export default function Home() {
   const router = useRouter();
   const [data, setData] = useState<Record<string, PlaceItem[]>>({});
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -88,17 +87,29 @@ export default function Home() {
           <TextInput
             placeholder="Search destinations..."
             style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
             returnKeyType="search"
-            onSubmitEditing={(e) => {
-              const q = e.nativeEvent.text.trim();
-              if (q) {
+            onSubmitEditing={() => {
+              if (search.trim()) {
                 router.push({
                   pathname: "/(navigation)/search",
-                  params: { q },
+                  params: { q: search.trim() },
                 });
+                setSearch("");
               }
             }}
           />
+
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch("")}>
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color="#94a3b8"
+              />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* CATEGORIES */}
@@ -187,8 +198,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 14,
     marginVertical: 16,
+    flexDirection: "row",
+    alignItems: "center",
   },
-  searchInput: { height: 44 },
+  searchInput: { flex: 1, height: 44 },
 
   sectionTitle: {
     fontSize: 18,

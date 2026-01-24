@@ -45,32 +45,65 @@ const tripTypes = [
   "Budget",
 ];
 
-/* ---------------- SCREEN ---------------- */
-
 export default function Search() {
   const router = useRouter();
   const { q } = useLocalSearchParams<{ q?: string }>();
 
   const allPlaces = getLocalPlaces();
+  const defaultPlaces = allPlaces.slice(0, 6);
 
-  /* 🔥 preload query from Home */
-  const [query, setQuery] = useState(q ?? "");
+  /* ---------------- STATE ---------------- */
+
+  const [query, setQuery] = useState("");
+  const [city, setCity] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedType, setSelectedType] = useState("All");
-  const [city, setCity] = useState("");
 
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  /* 🔥 sync Home search → Search page */
+  /* 🔥 NEW: default images cache */
+  const [defaultImages, setDefaultImages] = useState<
+    Record<string, string>
+  >({});
+
+  const isSearching =
+    query.trim().length > 0 || city.trim().length > 0;
+
+  /* ---------------- LOAD QUERY FROM HOME ---------------- */
+
   useEffect(() => {
     if (q) setQuery(q);
   }, [q]);
 
-  /* ---------------- FILTER + IMAGE FETCH ---------------- */
+  /* ---------------- PRELOAD DEFAULT IMAGES ---------------- */
 
   useEffect(() => {
-    const loadResults = async () => {
+    const loadDefaultImages = async () => {
+      const map: Record<string, string> = {};
+
+      for (const place of defaultPlaces) {
+        const img = await fetchImageForPlace(place.title);
+        if (img?.urls?.small) {
+          map[place.id] = img.urls.small;
+        }
+      }
+
+      setDefaultImages(map);
+    };
+
+    loadDefaultImages();
+  }, []);
+
+  /* ---------------- SEARCH LOGIC ---------------- */
+
+  useEffect(() => {
+    const runSearch = async () => {
+      if (!isSearching) {
+        setResults([]);
+        return;
+      }
+
       setLoading(true);
 
       const filtered = allPlaces.filter((place) => {
@@ -110,8 +143,8 @@ export default function Search() {
       setLoading(false);
     };
 
-    loadResults();
-  }, [query, selectedCategory, selectedType, city]);
+    runSearch();
+  }, [query, city, selectedCategory, selectedType]);
 
   /* ---------------- UI ---------------- */
 
@@ -127,15 +160,32 @@ export default function Search() {
           <View style={{ width: 24 }} />
         </View>
 
-        {/* SEARCH INPUT */}
-        <TextInput
-          placeholder="Search place name..."
-          value={query}
-          onChangeText={setQuery}
-          style={styles.input}
-        />
+        {/* SEARCH INPUT + ❌ */}
+        <View style={styles.searchWrapper}>
+          <TextInput
+            placeholder="Search place name..."
+            value={query}
+            onChangeText={setQuery}
+            style={styles.input}
+          />
 
-        {/* CITY FILTER */}
+          {query.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearBtn}
+              onPress={() => {
+                setQuery("");
+                setCity("");
+                setSelectedCategory("All");
+                setSelectedType("All");
+                setResults([]);
+              }}
+            >
+              <Ionicons name="close-circle" size={22} color="#94a3b8" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* CITY */}
         <TextInput
           placeholder="Enter city name"
           value={city}
@@ -143,7 +193,7 @@ export default function Search() {
           style={styles.input}
         />
 
-        {/* CATEGORY FILTER */}
+        {/* CATEGORY */}
         <Text style={styles.filterTitle}>Category</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((cat) => (
@@ -167,7 +217,7 @@ export default function Search() {
           ))}
         </ScrollView>
 
-        {/* TRIP TYPE FILTER */}
+        {/* TRIP TYPE */}
         <Text style={styles.filterTitle}>Trip Type</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {tripTypes.map((type) => (
@@ -191,16 +241,16 @@ export default function Search() {
           ))}
         </ScrollView>
 
-        {/* RESULTS */}
+        {/* RESULTS / DEFAULT CONTENT */}
         <Text style={styles.resultTitle}>
-          Results ({results.length})
+          {isSearching
+            ? `Results (${results.length})`
+            : "Popular Destinations"}
         </Text>
 
         {loading ? (
           <ActivityIndicator size="large" style={{ marginTop: 30 }} />
-        ) : results.length === 0 ? (
-          <Text style={styles.empty}>No destinations found</Text>
-        ) : (
+        ) : isSearching ? (
           results.map((place) => (
             <TouchableOpacity
               key={place.id}
@@ -226,6 +276,36 @@ export default function Search() {
               </View>
             </TouchableOpacity>
           ))
+        ) : (
+          defaultPlaces.map((place) => (
+            <TouchableOpacity
+              key={place.id}
+              style={styles.card}
+              onPress={() =>
+                router.push({
+                  pathname: "/(navigation)/place-details",
+                  params: {
+                    name: place.title,
+                    image: defaultImages[place.id] ?? "",
+                    section: place.category,
+                  },
+                })
+              }
+            >
+              {defaultImages[place.id] && (
+                <Image
+                  source={{ uri: defaultImages[place.id] }}
+                  style={styles.image}
+                />
+              )}
+              <View style={styles.cardInfo}>
+                <Text style={styles.placeTitle}>{place.title}</Text>
+                <Text style={styles.meta}>
+                  {place.category} • {place.city}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))
         )}
 
         <View style={{ height: 40 }} />
@@ -239,10 +319,7 @@ export default function Search() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f8fafc" },
 
-  container: {
-    paddingTop: 50,
-    padding: 16,
-  },
+  container: { paddingTop: 50, padding: 16 },
 
   header: {
     flexDirection: "row",
@@ -251,9 +328,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  title: {
-    fontSize: 20,
-    fontWeight: "800",
+  title: { fontSize: 20, fontWeight: "800" },
+
+  searchWrapper: { position: "relative" },
+
+  clearBtn: {
+    position: "absolute",
+    right: 14,
+    top: 13,
   },
 
   input: {
@@ -278,18 +360,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 
-  chipText: {
-    color: "#374151",
-    fontWeight: "600",
-  },
+  chipText: { color: "#374151", fontWeight: "600" },
 
-  activeChip: {
-    backgroundColor: "#2563eb",
-  },
+  activeChip: { backgroundColor: "#2563eb" },
 
-  activeChipText: {
-    color: "#fff",
-  },
+  activeChipText: { color: "#fff" },
 
   resultTitle: {
     fontSize: 18,
@@ -304,30 +379,15 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
-  image: {
-    width: "100%",
-    height: 160,
-  },
+  image: { width: "100%", height: 160 },
 
-  cardInfo: {
-    padding: 12,
-  },
+  cardInfo: { padding: 12 },
 
-  placeTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  placeTitle: { fontSize: 16, fontWeight: "700" },
 
-  meta: {
-    color: "#64748b",
-    marginTop: 4,
-  },
+  meta: { color: "#64748b", marginTop: 4 },
 
-  desc: {
-    marginTop: 6,
-    color: "#475569",
-    fontSize: 13,
-  },
+  desc: { marginTop: 6, color: "#475569", fontSize: 13 },
 
   empty: {
     textAlign: "center",
