@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   View,
   Text,
@@ -52,7 +53,7 @@ export default function Search() {
 
   const allPlaces = getLocalPlaces();
 
-  /* 🔥 IMPORTANT: preload query from Home */
+  /* 🔥 preload query from Home */
   const [query, setQuery] = useState(q ?? "");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedType, setSelectedType] = useState("All");
@@ -60,6 +61,11 @@ export default function Search() {
 
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+
+  /* 🔥 sync Home search → Search page */
+  useEffect(() => {
+    if (q) setQuery(q);
+  }, [q]);
 
   /* ---------------- FILTER + IMAGE FETCH ---------------- */
 
@@ -86,7 +92,7 @@ export default function Search() {
         return matchQuery && matchCategory && matchType && matchCity;
       });
 
-      const final = [];
+      const final: any[] = [];
 
       for (const place of filtered) {
         const img = await fetchImageForPlace(place.title);
@@ -112,7 +118,7 @@ export default function Search() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* 🔙 HEADER WITH BACK */}
+        {/* HEADER */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} />

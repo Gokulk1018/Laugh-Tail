@@ -1,4 +1,3 @@
-// app/(navigation)/home.tsx
 import {
   View,
   Text,
@@ -31,6 +30,10 @@ const categories = [
   { id: "6", name: "Snow", icon: "❄️" },
   { id: "7", name: "Island", icon: "🏝️" },
   { id: "8", name: "Mountain", icon: "⛰️" },
+
+  // ✅ NEW
+  { id: "9", name: "Temple", icon: "🛕" },
+  { id: "10", name: "Museum & Forts", icon: "🏰" },
 ];
 
 export default function Home() {

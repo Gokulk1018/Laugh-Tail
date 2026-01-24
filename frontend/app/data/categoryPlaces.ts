@@ -66,4 +66,21 @@ export const categoryPlaces: Record<string, string[]> = {
     "Rocky Mountains",
     "Himalayan Mountains",
   ],
+  Temple: [
+"Meenakshi Amman Temple",
+"Brihadeeswarar Temple",
+"Kedarnath Temple",
+"Golden Temple Amritsar",
+"Somnath Temple",
+],
+
+
+// 🏰 NEW
+"Museum & Forts": [
+"Red Fort Delhi",
+"Amber Fort Jaipur",
+"Agra Fort",
+"Louvre Museum",
+"British Museum",
+],
 };
