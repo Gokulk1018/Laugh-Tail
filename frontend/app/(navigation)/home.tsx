@@ -7,59 +7,47 @@ import {
   TouchableOpacity,
   TextInput,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
+import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { placesData } from "../data/places";
+import { fetchPlacesByCategory } from "../services/unsplashApi";
 
 /* ---------------- CATEGORIES (UI ONLY) ---------------- */
 
 const categories = [
-  { id: "1", name: "Beach", icon: "🏖️" },
-  { id: "2", name: "Mountains", icon: "⛰️" },
-  { id: "3", name: "Snow", icon: "❄️" },
-  { id: "4", name: "Adventure", icon: "🧗" },
-  { id: "5", name: "Forest", icon: "🌲" },
-  { id: "6", name: "Desert", icon: "🏜️" },
-  { id: "7", name: "Island", icon: "🏝️" },
-  { id: "8", name: "City", icon: "🏙️" },
+  { id: "1", name: "Beach", query: "beach", icon: "🏖️" },
+  { id: "2", name: "Mountains", query: "mountain", icon: "⛰️" },
+  { id: "3", name: "Snow", query: "snow", icon: "❄️" },
+  { id: "4", name: "Adventure", query: "adventure travel", icon: "🧗" },
+  { id: "5", name: "Forest", query: "forest", icon: "🌲" },
+  { id: "6", name: "Desert", query: "desert", icon: "🏜️" },
+  { id: "7", name: "Island", query: "island", icon: "🏝️" },
+  { id: "8", name: "City", query: "city travel", icon: "🏙️" },
 ];
 
 export default function Home() {
   const router = useRouter();
 
-  const renderSection = (sectionTitle: string) => {
-    const data = placesData[sectionTitle] || [];
+  const [places, setPlaces] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState("beach");
 
-    if (!data.length) return null;
+  /* ---------------- FETCH FROM UNSPLASH ---------------- */
 
-    return (
-      <>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{sectionTitle}</Text>
-        </View>
+  useEffect(() => {
+    const loadPlaces = async () => {
+      setLoading(true);
+      console.log("HOME SCREEN LOADED");
+      const data = await fetchPlacesByCategory(activeCategory);
+      console.log("DATA IN HOME:", data);
+      setPlaces(data);
+      setLoading(false);
+    };
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {data.map((item, index) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.placeCard}
-              activeOpacity={0.8}
-              onPress={() =>
-                router.push({
-                  pathname: "/place-details",
-                  params: { section: sectionTitle, index },
-                })
-              }
-            >
-              <Image source={item.image} style={styles.placeImage} />
-              <Text style={styles.placeTitle}>{item.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </>
-    );
-  };
+    loadPlaces();
+  }, [activeCategory]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -87,29 +75,63 @@ export default function Home() {
           />
         </View>
 
-        {/* CATEGORIES (UI ONLY FOR NOW) */}
+        {/* CATEGORIES */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Categories</Text>
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((item) => (
-            <View key={item.id} style={styles.categoryCard}>
+            <TouchableOpacity
+              key={item.id}
+              style={[
+                styles.categoryCard,
+                activeCategory === item.query && styles.activeCategory,
+              ]}
+              onPress={() => setActiveCategory(item.query)}
+            >
               <Text style={styles.categoryIcon}>{item.icon}</Text>
               <Text style={styles.categoryText}>{item.name}</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </ScrollView>
 
-        {/* 🔥 ALL SECTIONS FROM places.ts */}
-        {renderSection("Nearby Places")}
-        {renderSection("Famous Waterfalls")}
-        {renderSection("Beaches")}
-        {renderSection("Cold Places")}
-        {renderSection("Desert Destinations")}
-        {renderSection("Amusement Parks")}
+        {/* PLACES FROM API */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Popular Places</Text>
+        </View>
 
-        {/* Bottom spacing for tab bar */}
+        {loading ? (
+          <ActivityIndicator size="large" style={{ marginTop: 30 }} />
+        ) : (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {places.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.placeCard}
+                activeOpacity={0.8}
+                onPress={() =>
+                  router.push({
+                    pathname: "/place-details",
+                    params: {
+                      image: item.urls.regular,
+                      title: item.alt_description || "Beautiful place",
+                    },
+                  })
+                }
+              >
+                <Image
+                  source={{ uri: item.urls.small }}
+                  style={styles.placeImage}
+                />
+                <Text numberOfLines={1} style={styles.placeTitle}>
+                  {item.alt_description || "Beautiful place"}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
+
         <View style={{ height: 80 }} />
       </ScrollView>
     </SafeAreaView>
@@ -179,6 +201,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
+    opacity: 0.6,
+  },
+  activeCategory: {
+    opacity: 1,
   },
   categoryIcon: {
     fontSize: 26,
@@ -203,7 +229,7 @@ const styles = StyleSheet.create({
   },
   placeTitle: {
     marginTop: 8,
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "600",
   },
 });
