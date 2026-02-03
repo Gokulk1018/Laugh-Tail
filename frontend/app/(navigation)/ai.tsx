@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,302 +8,243 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
-const { height } = Dimensions.get("window");
-
-/* -------- STATIC NEARBY PLACES (FOR NOW) -------- */
+const { width, height } = Dimensions.get("window");
 
 const nearbyPlaces = [
-  {
-    id: "1",
-    name: "Marina Beach",
-    image: require("../../assets/images/home1.jpg"),
-    rating: 4.5,
-  },
-  {
-    id: "2",
-    name: "Mahabalipuram",
-    image: require("../../assets/images/home2.jpg"),
-    rating: 4.3,
-  },
-  {
-    id: "3",
-    name: "Yelagiri Hills",
-    image: require("../../assets/images/home3.jpg"),
-    rating: 4.1,
-  },
-  {
-    id: "4",
-    name: "Pondicherry",
-    image: require("../../assets/images/home4.jpg"),
-    rating: 4.6,
-  },
+  { id: "1", name: "Marina Beach", image: require("../../assets/images/home1.jpg"), rating: 4.5, tag: "Coastal" },
+  { id: "2", name: "Mahabalipuram", image: require("../../assets/images/home2.jpg"), rating: 4.3, tag: "Heritage" },
+  { id: "3", name: "Yelagiri Hills", image: require("../../assets/images/home3.jpg"), rating: 4.1, tag: "Nature" },
+  { id: "4", name: "Pondicherry", image: require("../../assets/images/home4.jpg"), rating: 4.6, tag: "Peaceful" },
 ];
 
 export default function AIPage() {
+  const [message, setMessage] = useState("");
+
   return (
-    <View style={styles.container}>
-      {/* ================= CHAT CARD ================= */}
-      <View style={styles.chatWrapper}>
-        <View style={styles.chatCard}>
-          {/* AI HEADER */}
-          <View style={styles.aiHeader}>
-            <View style={styles.aiIconWrap}>
-              <Ionicons name="sparkles" size={18} color="#000000" />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        {/* --- HEADER --- */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>AI Assistant</Text>
+            <View style={styles.statusRow}>
+              <View style={styles.statusDot} />
+              <Text style={styles.headerSub}>Active</Text>
             </View>
-            <Text style={styles.aiTitle}>AI Assistant</Text>
           </View>
-
-          {/* CHAT MESSAGES */}
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.chat}
-          >
-            {/* AI MESSAGE */}
-            <View style={styles.aiRow}>
-              <View style={styles.aiBubble}>
-                <Text style={styles.aiText}>
-                  Hi Gokul 👋 I’m your AI travel assistant.
-                  Tell me what kind of trip you’re planning 😊
-                </Text>
-              </View>
-            </View>
-
-            {/* USER MESSAGE */}
-            <View style={styles.userRow}>
-              <View style={styles.userBubble}>
-                <Text style={styles.userText}>
-                  I want a peaceful place nearby
-                </Text>
-              </View>
-            </View>
-
-            {/* AI RESPONSE */}
-            <View style={styles.aiRow}>
-              <View style={styles.aiBubble}>
-                <Text style={styles.aiText}>
-                  Got it 🌿 I’ve analyzed your request and found some nearby
-                  places that match your mood. You can explore them below 👇
-                </Text>
-              </View>
-            </View>
-          </ScrollView>
-
-          {/* INPUT BAR */}
-          <View style={styles.inputBar}>
-            <TextInput
-              placeholder="Type your message..."
-              style={styles.input}
-            />
-            <TouchableOpacity style={styles.sendBtn}>
-              <Ionicons name="send" size={18} color="#ffffff" />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.iconBtn}>
+            <Ionicons name="sparkles" size={20} color="#4f46e5" />
+          </TouchableOpacity>
         </View>
-      </View>
 
-      {/* ================= PLACES SECTION ================= */}
-      <View style={styles.placesSection}>
-        <Text style={styles.sectionTitle}>Nearby Places 📍</Text>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.placesRow}
-        >
-          {nearbyPlaces.map((place) => (
-            <View key={place.id} style={styles.placeCard}>
-              <Image source={place.image} style={styles.placeImage} />
-
-              <View style={styles.placeInfo}>
-                <Text style={styles.placeName}>{place.name}</Text>
-
-                <View style={styles.ratingRow}>
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Ionicons
-                      key={i}
-                      name={
-                        i <= Math.round(place.rating)
-                          ? "star"
-                          : "star-outline"
-                      }
-                      size={14}
-                      color="#facc15"
-                    />
-                  ))}
-                  <Text style={styles.ratingText}>{place.rating}</Text>
+        {/* --- CHAT SECTION --- */}
+        <View style={styles.chatWrapper}>
+          <View style={styles.chatCard}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.chatContent}
+            >
+              <View style={styles.aiRow}>
+                <View style={styles.aiBubble}>
+                  <Text style={styles.aiText}>
+                    Hi Gokul! I curated a few peaceful spots within 100km of your location. 🌿
+                  </Text>
                 </View>
               </View>
+
+              <View style={styles.userRow}>
+                <LinearGradient
+                  colors={["#4f46e5", "#3730a3"]}
+                  style={styles.userBubble}
+                >
+                  <Text style={styles.userText}>I want a peaceful place nearby</Text>
+                </LinearGradient>
+              </View>
+
+              <View style={styles.aiRow}>
+                <View style={styles.aiBubble}>
+                  <Text style={styles.aiText}>
+                    Analyzing your mood... Check out these serene destinations below! 👇
+                  </Text>
+                </View>
+              </View>
+            </ScrollView>
+
+            <View style={styles.inputArea}>
+              <View style={styles.inputWrap}>
+                <TextInput
+                  placeholder="Message Gemini..."
+                  style={styles.input}
+                  value={message}
+                  onChangeText={setMessage}
+                  placeholderTextColor="#94a3b8"
+                />
+                <TouchableOpacity activeOpacity={0.7}>
+                  <LinearGradient
+                    colors={["#4f46e5", "#3730a3"]}
+                    style={styles.sendBtn}
+                  >
+                    <Ionicons name="arrow-up" size={18} color="#fff" />
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
             </View>
-          ))}
-        </ScrollView>
-      </View>
-    </View>
+          </View>
+        </View>
+
+        {/* --- NEARBY PLACES (Overflow Fixed) --- */}
+        <View style={styles.placesSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Recommendations</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeAll}>View All</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.placesList}
+            snapToInterval={210} // Snap effect for pro feel
+            decelerationRate="fast"
+          >
+            {nearbyPlaces.map((place) => (
+              <TouchableOpacity key={place.id} activeOpacity={0.9} style={styles.placeCard}>
+                <Image source={place.image} style={styles.placeImage} />
+                <View style={styles.glassBadge}>
+                  <Text style={styles.tagText}>{place.tag}</Text>
+                </View>
+                
+                <View style={styles.placeInfo}>
+                  <Text numberOfLines={1} style={styles.placeName}>{place.name}</Text>
+                  <View style={styles.ratingRow}>
+                    <Ionicons name="star" size={12} color="#f59e0b" />
+                    <Text style={styles.ratingText}>{place.rating}</Text>
+                    <Text style={styles.distanceText}>(12 km away)</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
-/* ================= STYLES ================= */
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8fafc",
+  container: { flex: 1, backgroundColor: "#f8fafc" },
+  
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    paddingHorizontal: 24,
+    paddingVertical: 12
   },
+  headerTitle: { fontSize: 22, fontWeight: '900', color: '#0f172a' },
+  statusRow: { flexDirection: 'row', alignItems: 'center' },
+  statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#22c55e', marginRight: 6 },
+  headerSub: { fontSize: 12, color: '#64748b', fontWeight: '700', textTransform: 'uppercase' },
+  iconBtn: { backgroundColor: '#fff', padding: 8, borderRadius: 12, elevation: 2, shadowOpacity: 0.05 },
 
-  /* CHAT CARD */
-  chatWrapper: {
-    height: height * 0.55,
-    padding: 16,
+  /* CHAT SECTION */
+  chatWrapper: { 
+    height: height * 0.42, // Adjusted to give more room below
+    paddingHorizontal: 16 
   },
   chatCard: {
     flex: 1,
     backgroundColor: "#ffffff",
-    borderRadius: 22,
-    borderWidth: 0.5,
-    borderColor: "#e5e7eb",
-    overflow: "hidden",
-
+    borderRadius: 28,
+    elevation: 4,
     shadowColor: "#000",
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.06,
+    shadowRadius: 15,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    overflow: 'hidden'
+  },
+  chatContent: { padding: 18 },
+  
+  aiRow: { alignItems: 'flex-start', marginBottom: 12 },
+  aiBubble: { 
+    backgroundColor: '#f1f5f9', 
+    padding: 14, 
+    borderTopRightRadius: 20, 
+    borderBottomRightRadius: 20, 
+    borderBottomLeftRadius: 20, 
+    borderTopLeftRadius: 4,
+    maxWidth: '85%' 
+  },
+  aiText: { color: '#334155', fontSize: 14, lineHeight: 20, fontWeight: '500' },
+
+  userRow: { alignItems: 'flex-end', marginBottom: 12 },
+  userBubble: { 
+    padding: 14, 
+    borderTopLeftRadius: 20, 
+    borderBottomLeftRadius: 20, 
+    borderTopRightRadius: 20, 
+    borderBottomRightRadius: 4,
+    maxWidth: '85%' 
+  },
+  userText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+
+  inputArea: { padding: 10, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#f1f5f9' },
+  inputWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f8fafc', borderRadius: 18, paddingLeft: 12, paddingRight: 6 },
+  input: { flex: 1, height: 46, fontSize: 14, color: '#0f172a' },
+  sendBtn: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+
+  /* PLACES SECTION (FIXED OVERFLOW) */
+  placesSection: { 
+    flex: 1, // Takes up remaining space
+    marginTop: 20,
+    paddingBottom: 10
+  },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#0f172a' },
+  seeAll: { color: '#4f46e5', fontWeight: '700', fontSize: 13 },
+  
+  placesList: { 
+    paddingLeft: 24, 
+    paddingRight: 12,
+    alignItems: 'flex-start' // Ensures cards don't stretch vertically
+  },
+
+  placeCard: { 
+    width: 200, 
+    backgroundColor: '#fff', 
+    borderRadius: 24, 
+    marginRight: 16, 
+    elevation: 3, 
+    shadowOpacity: 0.05, 
     shadowRadius: 8,
-    elevation: 3,
+    marginBottom: 10, // Buffer for shadow
+    overflow: 'hidden'
   },
-
-  /* AI HEADER */
-  aiHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#e5e7eb",
+  placeImage: { width: '100%', height: 110 },
+  glassBadge: { 
+    position: 'absolute', top: 8, left: 8, 
+    backgroundColor: 'rgba(255,255,255,0.9)', 
+    paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 
   },
-  aiIconWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#e0e7ff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  aiTitle: {
-    marginLeft: 8,
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#1e293b",
-  },
-
-  chat: {
-    padding: 16,
-    paddingBottom: 80,
-    
-  },
-
-  aiRow: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    marginBottom: 10,
-  },
-  aiBubble: {
-    maxWidth: "80%",
-    backgroundColor: "#e6e7e9",
-    borderRadius: 16,
-    padding: 12,
-  },
-  aiText: {
-    color: "#0e1012",
-    lineHeight: 20,
-  },
-
-  userRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 10,
-  },
-  userBubble: {
-    maxWidth: "80%",
-    backgroundColor: "#080808",
-    borderRadius: 16,
-    padding: 12,
-  },
-  userText: {
-    color: "#ffffff",
-    lineHeight: 20,
-  },
-
-  /* INPUT */
-  inputBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#ffffff",
-    borderTopWidth: 0.5,
-    borderTopColor: "#e5e7eb",
-  },
-  input: {
-    flex: 1,
-    height: 44,
-    backgroundColor: "#f1f5f9",
-    borderRadius: 22,
-    paddingHorizontal: 16,
-  },
-  sendBtn: {
-    marginLeft: 10,
-    backgroundColor: "#000000",
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  /* PLACES */
-  placesSection: {
-    flex: 1,
-    paddingTop: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    paddingHorizontal: 16,
-    marginBottom: 10,
-  },
-  placesRow: {
-    paddingHorizontal: 16,
-    gap: 14,
-  },
-  placeCard: {
-    width: 160,
-    backgroundColor: "#ffffff",
-    borderRadius: 18,
-    overflow: "hidden",
-  },
-  placeImage: {
-    width: "100%",
-    height: 110,
-  },
-  placeInfo: {
-    padding: 10,
-  },
-  placeName: {
-    fontWeight: "700",
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  ratingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-  },
-  ratingText: {
-    fontSize: 12,
-    color: "#475569",
-    marginLeft: 4,
-  },
+  tagText: { fontSize: 9, fontWeight: '900', color: '#4f46e5', textTransform: 'uppercase' },
+  
+  placeInfo: { padding: 12 },
+  placeName: { fontSize: 15, fontWeight: '800', color: '#0f172a', marginBottom: 2 },
+  ratingRow: { flexDirection: 'row', alignItems: 'center' },
+  ratingText: { fontSize: 12, fontWeight: '800', color: '#0f172a', marginLeft: 4 },
+  distanceText: { fontSize: 11, color: '#94a3b8', marginLeft: 4, fontWeight: '500' }
 });

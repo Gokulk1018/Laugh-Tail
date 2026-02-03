@@ -36,7 +36,6 @@ export default function EditProfile() {
     "⛰ Mountains",
   ]);
 
-  // ✅ TOAST STATE
   const [showToast, setShowToast] = useState(false);
 
   const togglePreference = (item: string) => {
@@ -67,7 +66,9 @@ export default function EditProfile() {
         <TouchableOpacity onPress={goBackToProfile}>
           <Ionicons name="arrow-back" size={24} color="#0f172a" />
         </TouchableOpacity>
+
         <Text style={styles.topTitle}>Edit Profile</Text>
+
         <View style={{ width: 24 }} />
       </View>
 
@@ -78,6 +79,7 @@ export default function EditProfile() {
             source={require("../../assets/images/profile.jpg")}
             style={styles.avatar}
           />
+
           <TouchableOpacity style={styles.photoBtn}>
             <Text style={styles.photoText}>Change Photo</Text>
           </TouchableOpacity>
@@ -117,6 +119,7 @@ export default function EditProfile() {
           <View style={styles.chips}>
             {TRAVEL_PREFERENCES.map((item) => {
               const selected = selectedPrefs.includes(item);
+
               return (
                 <TouchableOpacity
                   key={item}
@@ -160,7 +163,7 @@ export default function EditProfile() {
         <View style={{ height: 30 }} />
       </ScrollView>
 
-      {/* ✅ SUCCESS TOAST */}
+      {/* SUCCESS TOAST */}
       {showToast && (
         <View style={styles.toast}>
           <Text style={styles.toastText}>Changes updated</Text>
@@ -289,7 +292,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  /* TOAST */
   toast: {
     position: "absolute",
     bottom: 40,
@@ -304,4 +306,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
   },
-}); 
+});
